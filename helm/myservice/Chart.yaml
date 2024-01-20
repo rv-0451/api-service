@@ -1,0 +1,12 @@
+apiVersion: v2
+name: myservice
+description: A Helm chart for Kubernetes
+
+# A chart can be either an 'application' or a 'library' chart.
+type: application
+
+# The chart version.
+version: 0.0.1
+
+# The version number of the application being deployed.
+appVersion: "latest"

@@ -1,0 +1,33 @@
+services:
+  mongodb:
+    container_name: mongodb
+    image: mongo:7.0.5
+    ports:
+      - 27017:27017
+    volumes:
+      - type: volume
+        source: mongodb-volume
+        target: /data/db     
+    networks:
+      - myservice-net
+
+  api-service:
+    container_name: api-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: 192.168.33.16:5000/api-service:latest
+    ports:
+      - 8000:8000
+    environment:
+      - SERVE_PORT=8000
+      - MONGO_HOST=mongodb
+    networks:
+      - myservice-net
+
+volumes:
+  mongodb-volume:
+
+networks:
+  myservice-net:
+    driver: bridge

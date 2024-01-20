@@ -1,0 +1,10 @@
+venv
+*.md
+__pycache__
+.pytest_cache
+.git
+app/test_*
+Dockerfile
+.dockerignore
+.gitignore
+.vscode
