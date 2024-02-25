@@ -8,4 +8,6 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 COPY ./app /app
 
+USER 65532:65532
+
 CMD ["python", "api-service.py"]
