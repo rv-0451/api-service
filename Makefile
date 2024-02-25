@@ -1,5 +1,5 @@
 VERSION ?= latest
-IMAGE_TAG_BASE ?= 192.168.33.16:5000/api-service
+IMAGE_TAG_BASE ?= 192.168.100.20:5000/api-service
 IMG ?= $(IMAGE_TAG_BASE):$(VERSION)  
 
 SHELL = /usr/bin/env bash -o pipefail
@@ -79,6 +79,7 @@ docker-run: ## Run the service with docker
 .PHONY: docker-rm
 docker-rm: ## Stop and remove all service's docker containers
 	docker compose rm --stop --force
+	# docker image rm  192.168.100.20:5000/api-service:latest
 
 ##@ Testing
 
