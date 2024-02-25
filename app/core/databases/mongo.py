@@ -11,7 +11,7 @@ class MongoManager:
         self.data = self.db["data"]
 
     def insert_one(self, d: Dict) -> None:
-        self.data.insert_one(d).inserted_id
+        self.data.insert_one(d)
 
     def find_one(self, name: str) -> Union[Any, None]:
         return self.data.find_one({"name": name})
