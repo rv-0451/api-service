@@ -7,6 +7,9 @@ SHELL = /usr/bin/env bash -o pipefail
 
 PIP_PROXY = https://pypi.python.org/simple
 SERVE_PORT ?= 8000
+SECRET_KEY ?= mysecretkey
+API_KEY ?= myapikey
+BASIC_PASSWORD ?= mybasicpass
 
 ##@ General
 
@@ -70,7 +73,7 @@ mongo-run: ## Run mongo container for local development
 run: dependencies ## Run the service locally
 	source venv/bin/activate && \
 	cd app && \
-	SERVE_PORT=${SERVE_PORT} python3 api-service.py
+	SERVE_PORT=${SERVE_PORT} SECRET_KEY=${SECRET_KEY} API_KEY=${API_KEY} BASIC_PASSWORD=${BASIC_PASSWORD} python3 api-service.py
 
 .PHONY: docker-run
 docker-run: ## Run the service with docker
@@ -89,7 +92,7 @@ test: ## Test the service
 	source venv/bin/activate && \
 	pip install pytest httpx mongomock -i ${PIP_PROXY} && \
 	cd app && \
-	SERVE_PORT=${SERVE_PORT} pytest
+	SERVE_PORT=${SERVE_PORT} SECRET_KEY=${SECRET_KEY} API_KEY=${API_KEY} BASIC_PASSWORD=${BASIC_PASSWORD} pytest
 
 ##@ Deployment
 

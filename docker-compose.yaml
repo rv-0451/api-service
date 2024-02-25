@@ -22,6 +22,9 @@ services:
     environment:
       - SERVE_PORT=8000
       - MONGO_HOST=mongodb
+      - SECRET_KEY=mysecretkey
+      - API_KEY=myapikey
+      - BASIC_PASSWORD=mybasicpass
     networks:
       - myservice-net
 

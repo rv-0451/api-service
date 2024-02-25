@@ -2,8 +2,10 @@ import logging
 from fastapi import APIRouter, Path, HTTPException, status, Depends
 from core.schemas.data import Data
 from core.databases.mongo import MongoManager
+from core.schemas.users import User
 from typing import List
 from typing_extensions import Annotated
+from dependencies import auth_check
 
 
 log = logging.getLogger()
@@ -48,6 +50,7 @@ async def read_data(
 async def create_data(
     mm: Annotated[MongoManager, Depends(MongoManager)],
     data: Data,
+    user: User = Depends(auth_check),
 ):
     """
     Create data (fail if it already exists):
@@ -55,6 +58,8 @@ async def create_data(
     - **name**: full data name
     - **metadata**: some metadata
     """
+
+    log.info(f"connected as user: {user.login}")
 
     data_found = mm.find_one(data.name)
     if data_found:
@@ -87,6 +92,7 @@ async def update_data(
     mm: Annotated[MongoManager, Depends(MongoManager)],
     data: Data,
     name: str = Path(examples=["name"]),
+    user: User = Depends(auth_check),
 ):
     """
     Update data (fail if it does not exist),
@@ -95,6 +101,8 @@ async def update_data(
     - **name**: full data name
     - **metadata**: some metadata
     """
+
+    log.info(f"connected as user: {user.login}")
 
     data_found = mm.find_one(name)
     if data_found is None:
@@ -129,11 +137,14 @@ async def update_data(
 async def delete_data(
     mm: Annotated[MongoManager, Depends(MongoManager)],
     name: str = Path(examples=["name"]),
+    user: User = Depends(auth_check),
 ):
     """
     Delete data, expects full data name,
     return 404 if the data is not found
     """
+
+    log.info(f"connected as user: {user.login}")
 
     data_found = mm.find_one(name)
     if data_found is None:

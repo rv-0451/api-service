@@ -20,6 +20,21 @@ spec:
           value: {{ .Values.mongoHost | quote }}
         - name: MONGO_PORT
           value: {{ .Values.mongoPort | quote }}
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-service
+              key: secretKey
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-service
+              key: apiKey
+        - name: BASIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: api-service
+              key: basicPassword
         image: {{ .Values.appImage | quote }}
         imagePullPolicy: Always
         name: api-service

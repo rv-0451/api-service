@@ -14,6 +14,7 @@ The following endpoints are implemented:
 | Update | `PUT`       | `/api/v1/data/{name}`
 | Delete | `DELETE`    | `/api/v1/data/{name}`
 | Query  | `GET`       | `/api/v1/search?metadata.key=value`
+| Auth   | `POST`      | `/api/v1/auth/tokens`
 
 ## Schema:
 
@@ -30,12 +31,21 @@ Clone this repo on your local linux machine.
 Requirements for deploying to kubernetes:
 
 - `api-service.vagrant.local` dns hostname should resolve to kubernetes apiserver IP (or update ingress host in `helm/myservice/values.yaml`)
-- kubernetes cluster should have access to DockerHub to pull images
 - `helm` installed on the local machine
+- access to dockerhub to pull mongo image
 - kubernetes cluster should be accessible from the local machine
 - `kubeconfig` file with sufficient permissions (create namespaces + all verbs on deployment/service/ingress resources)
+- `ingress controller` should be installed in kubernetes
 
 ```bash
+# adjust IMAGE_TAG_BASE in Makefile to your desired registry
+vi Makefile
+
+# then build and push
+make docker-build
+make docker-push
+
+# and finally deploy to k8s
 export KUBECONFIG=/path/to/kubeconfig
 make helm-deploy
 ```
@@ -51,12 +61,37 @@ Requirements for running:
 make docker-run
 ```
 
-## Try it:
+## Authentication
 
-The examples below are for the kubernetes deployment. If running locally with `docker compose` replace hostname `api-service.vagrant.local` with `0.0.0.0:8000` in the `curl` command below
+Get, list, search queries do not require authentication. Auth required for post, put, delete actions. There are several auth options checked in the following order:
+
+1. Header `X-API-KEY`
+1. Basic with `x-admin-user` user
+1. Oauth2 bearer token
+
+Use the following headers for auth:
 
 ```bash
-curl -s -H "Content-Type: application/json" -X POST http://api-service.vagrant.local/api/v1/data -d '{"name": "data-1", "metadata": {"property-1": {"enabled": "true"}, "property-2": {"property-3": {"enabled": "true", "value": "value-3"}}}}' | jq
+# For header key:
+AUTH_HEADER="X-API-KEY: myapikey"
+
+# For basic:
+AUTH_HEADER="Authorization: Basic $(echo -n 'x-admin-user:mybasicpass' | base64 -w 0)"
+
+# For bearer token:
+HOSTNAME=api-service.vagrant.local # or localhost:8000 if running locally
+TOKEN=$(curl -s -X POST "http://$HOSTNAME/api/v1/auth/tokens" --form "username=testuser" --form "password=test" | jq -r '.access_token')
+AUTH_HEADER="Authorization: Bearer $TOKEN"
+```
+
+## Try it:
+
+The examples below are for the kubernetes deployment. If running locally with `docker compose` replace hostname `api-service.vagrant.local` with `localhost:8000` in the `curl` command below
+
+```bash
+HOSTNAME=api-service.vagrant.local # or localhost:8000
+
+curl -s -H $AUTH_HEADER -H "Content-Type: application/json" -X POST http://$HOSTNAME/api/v1/data -d '{"name": "data-1", "metadata": {"property-1": {"enabled": "true"}, "property-2": {"property-3": {"enabled": "true", "value": "value-3"}}}}' | jq
 {
   "name": "data-1",
   "metadata": {
@@ -72,7 +107,7 @@ curl -s -H "Content-Type: application/json" -X POST http://api-service.vagrant.l
   }
 }
 
-curl -s http://api-service.vagrant.local/api/v1/search\?metadata.property-3.enabled\=true | jq
+curl -s http://$HOSTNAME/api/v1/search\?metadata.property-2.property-3.enabled\=true | jq
 [
   {
     "name": "data-1",

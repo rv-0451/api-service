@@ -2,6 +2,10 @@ appPort: 8000
 appImage: 192.168.100.20:5000/api-service:latest
 appIngress: api-service.vagrant.local
 
+secretKey: mysecretkey
+apiKey: myapikey
+basicPassword: mybasicpass
+
 mongoHost: mongodb
 mongoPort: 27017
 mongoImage: mongo:7.0.5

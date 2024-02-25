@@ -2,7 +2,7 @@ import uvicorn
 import logging.config
 from utils.logger import LOGGING_CONFIG
 from fastapi import FastAPI
-from v1.routers import data, search
+from v1.routers import auth, data, search
 from core.settings import AppSettings
 
 
@@ -13,6 +13,7 @@ app_settings = AppSettings()
 
 
 app = FastAPI()
+app.include_router(auth.router)
 app.include_router(data.router)
 app.include_router(search.router)
 

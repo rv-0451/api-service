@@ -8,6 +8,9 @@ from importlib import import_module
 sys.path.append(os.path.dirname(__file__))
 
 
+API_KEY = os.getenv("API_KEY")
+
+
 data1 = {"name": "data-1", "metadata": {"property-1": {"enabled": "true"}, "property-2": {"property-3": {"enabled": "true", "value": "value-3"}}}}
 data2 = {"name": "data-2", "metadata": {"property-1": {"enabled": "true"}, "property-4": {"property-5": {"enabled": "true", "value": "value-5"}}}}
 data3 = {"name": "data-3", "metadata": {"property-1": {"enabled": "true"}, "property-6": {"property-7": {"enabled": "true", "value": "value-7"}}}}
@@ -31,7 +34,7 @@ def test_get_full_db():
     for data in [data1, data2, data3]:
         response = client.post(
             "/api/v1/data",
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "X-API-KEY": API_KEY},
             json=data
         )
     response = client.get("/api/v1/data")
@@ -46,7 +49,7 @@ def test_post_data():
     for data in [data1, data2, data3]:
         response = client.post(
             "/api/v1/data",
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "X-API-KEY": API_KEY},
             json=data
         )
         assert response.status_code == 201
@@ -57,12 +60,12 @@ def test_post_data():
 def test_post_same_data():
     response = client.post(
         "/api/v1/data",
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "X-API-KEY": API_KEY},
         json=data1
     )
     response = client.post(
         "/api/v1/data",
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "X-API-KEY": API_KEY},
         json=data1
     )
     assert response.status_code == 409
@@ -81,7 +84,7 @@ def test_get_data():
     for data in [data1, data2, data3]:
         response = client.post(
             "/api/v1/data",
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "X-API-KEY": API_KEY},
             json=data
         )
 
@@ -99,7 +102,7 @@ def test_put_non_existent_data():
     name = data1["name"]
     response = client.put(
         f"/api/v1/data/{name}",
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "X-API-KEY": API_KEY},
         json=data1
     )
     assert response.status_code == 404
@@ -110,14 +113,14 @@ def test_put_overwriting_existing_data():
     for data in [data1, data2]:
         response = client.post(
             "/api/v1/data",
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "X-API-KEY": API_KEY},
             json=data
         )
 
     name = data1["name"]
     response = client.put(
         f"/api/v1/data/{name}",
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "X-API-KEY": API_KEY},
         json=data2
     )
     assert response.status_code == 409
@@ -127,14 +130,14 @@ def test_put_overwriting_existing_data():
 def test_put_data():
     response = client.post(
         "/api/v1/data",
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "X-API-KEY": API_KEY},
         json=data1
     )
 
     name = data1["name"]
     response = client.put(
         f"/api/v1/data/{name}",
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "X-API-KEY": API_KEY},
         json=data2
     )
     assert response.status_code == 200
@@ -145,7 +148,10 @@ def test_put_data():
 
 @mongomock.patch(servers=(('localhost', 27017),))
 def test_delete_non_existent_data():
-    response = client.delete("/api/v1/data/fake-data")
+    response = client.delete(
+        "/api/v1/data/fake-data",
+        headers={"X-API-KEY": API_KEY},
+    )
     assert response.status_code == 404
 
 
@@ -153,11 +159,14 @@ def test_delete_non_existent_data():
 def test_delete_data():
     response = client.post(
         "/api/v1/data",
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "X-API-KEY": API_KEY},
         json=data1
     )
     name = data1["name"]
-    response = client.delete(f"/api/v1/data/{name}")
+    response = client.delete(
+        f"/api/v1/data/{name}",
+        headers={"X-API-KEY": API_KEY},
+    )
     assert response.status_code == 200
     assert response.json() == data1
 
@@ -194,7 +203,7 @@ def test_search_data():
     for data in [data1, data2]:
         response = client.post(
             "/api/v1/data",
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "X-API-KEY": API_KEY},
             json=data
         )
 
