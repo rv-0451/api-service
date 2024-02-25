@@ -29,7 +29,7 @@ Clone this repo on your local linux machine.
 
 Requirements for deploying to kubernetes:
 
-- `api-service.minikube.local` dns hostname should resolve to minikube's IP (or update ingress host in `helm/myservice/values.yaml`)
+- `api-service.vagrant.local` dns hostname should resolve to kubernetes apiserver IP (or update ingress host in `helm/myservice/values.yaml`)
 - kubernetes cluster should have access to DockerHub to pull images
 - `helm` installed on the local machine
 - kubernetes cluster should be accessible from the local machine
@@ -53,10 +53,10 @@ make docker-run
 
 ## Try it:
 
-The examples below are for the kubernetes deployment. If running locally with `docker compose` replace hostname `api-service.minikube.local` with `0.0.0.0:8000` in the `curl` command below
+The examples below are for the kubernetes deployment. If running locally with `docker compose` replace hostname `api-service.vagrant.local` with `0.0.0.0:8000` in the `curl` command below
 
 ```bash
-curl -s -H "Content-Type: application/json" -X POST http://api-service.minikube.local/api/v1/data -d '{"name": "data-1", "metadata": {"property-1": {"enabled": "true"}, "property-2": {"property-3": {"enabled": "true", "value": "value-3"}}}}' | jq
+curl -s -H "Content-Type: application/json" -X POST http://api-service.vagrant.local/api/v1/data -d '{"name": "data-1", "metadata": {"property-1": {"enabled": "true"}, "property-2": {"property-3": {"enabled": "true", "value": "value-3"}}}}' | jq
 {
   "name": "data-1",
   "metadata": {
@@ -72,7 +72,7 @@ curl -s -H "Content-Type: application/json" -X POST http://api-service.minikube.
   }
 }
 
-curl -s http://api-service.minikube.local/api/v1/search\?metadata.property-3.enabled\=true | jq
+curl -s http://api-service.vagrant.local/api/v1/search\?metadata.property-3.enabled\=true | jq
 [
   {
     "name": "data-1",
@@ -93,8 +93,8 @@ curl -s http://api-service.minikube.local/api/v1/search\?metadata.property-3.ena
 
 ## Auto-generated documentation:
 
-- `Swagger` http://api-service.minikube.local/docs
-- `ReDoc`: http://api-service.minikube.local/redoc
+- `Swagger` http://api-service.vagrant.local/docs
+- `ReDoc`: http://api-service.vagrant.local/redoc
 
 
 # Local development

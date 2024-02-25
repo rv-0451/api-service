@@ -16,7 +16,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: 192.168.33.16:5000/api-service:latest
+    image: 192.168.100.20:5000/api-service:latest
     ports:
       - 8000:8000
     environment:

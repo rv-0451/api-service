@@ -1,6 +1,6 @@
 appPort: 8000
-appImage: 192.168.33.16:5000/api-service:latest
-appIngress: api-service.minikube.local
+appImage: 192.168.100.20:5000/api-service:latest
+appIngress: api-service.vagrant.local
 
 mongoHost: mongodb
 mongoPort: 27017
